@@ -16,7 +16,7 @@ python3 problem_1.py lamina.bed
 ```
 
 Which chromosome has the most intervals?
-``write your answer here``
+``chr3``
 
 ## Problem 2
 Write a python program that parses a fastq file and determines the total number
@@ -30,7 +30,7 @@ python3 problem_2.py SP1.fq
 ```
 
 What is the total number of ``C`` bases?
-``write your answer here``
+``2046``
 
 ## Problem 3:
 Write a python program that parses a fastq file and determines the most
@@ -38,10 +38,10 @@ common 6-mer (aka hexamer) sequence at the 5' and also the 3' end of each read.
 Write the program as a python script named ``problem_3.py``
 
 What is the most common hexamer at the 5' end?
-``write your answer here``
+``CCCCCC``
 
 What is the most common hexamer at the 3' end?
-``write your answer here``
+``ACCCCC``
 
 ## Problem 4:
 
@@ -78,3 +78,122 @@ How many alignments with no mismatches?
 How many alignments with more than zero mismatches?
 ``your answer here``
 
+
+# problem_1.py
+from collections import Counter
+
+data_file = ("/Users/katiearnolds/data-sets/bed/lamina.bed")
+
+counts = Counter()
+ 
+for line in open(data_file):
+  if line.startswith('#'): continue
+  fields = line.split('\t')
+  chrom = fields[0]
+  counts[chrom] += 1
+    
+for chrom, count in counts.items():
+  sortme = [(v,k) for k,v in counts.items()]
+  sortme.sort()
+  sortme.reverse()
+print (sortme[0] [1])
+
+# problem_2.py
+import sys
+
+filename = ("/Users/katiearnolds/data-sets/fastq/SP1.fq")
+fqfile = filename
+
+def main():
+  if len(sys.argv) != 2:
+    print("need name of fq file to parse!")
+    sys.exit(1)
+    
+  filename = sys.argv[1]
+  
+  num_C = 0
+  
+  with open(filename, "r") as fqfile:
+    for lineno, line in enumerate(fqfile):
+      if lineno %4 != 1:
+        continue
+      num_C += len([1 
+                    for character in line
+                    if character == 'C'])
+#      for character in line:
+#        if character == 'C':
+#          num_C +=1
+
+  print(num_C)
+      
+
+if __name__ == "__main__":
+  main()
+
+#problem_3.py
+import sys
+import operator
+
+def main():
+  if len(sys.argv) != 2:
+    print("need name of fq file to parse!")
+    sys.exit(1)
+    
+  filename = sys.argv[1]
+  
+  starting_hexamers = {}
+  ending_hexamers = {}
+  
+  with open(filename, "r") as fqfile:
+    for lineno, line in enumerate(fqfile):
+      line = line.strip()
+      if lineno %4 != 1:
+        continue
+
+      starting_hexamer = line[:6]
+      if starting_hexamer in starting_hexamers:
+        starting_hexamers[starting_hexamer] += 1
+      else:
+        starting_hexamers[starting_hexamer] = 1
+
+      ending_hexamer = line[-6:]
+      if ending_hexamer in ending_hexamers:
+        ending_hexamers[ending_hexamer] += 1
+      else:
+        ending_hexamers[ending_hexamer] = 1
+
+        
+    print(max(starting_hexamers.iteritems(), key=operator.itemgetter(1))[0])
+    print(max(ending_hexamers.iteritems(), key=operator.itemgetter(1))[0])
+
+
+
+if __name__ == "__main__":
+  main()
+  
+#problem_5.py
+import sys
+import operator
+from collections import Counter
+import pysam
+
+
+
+def main():
+  if len(sys.argv) != 2:
+    sys.exit(1)
+    
+  filename = sys.argv[1]
+  
+bamfile = AlignmentFile (filename)
+
+counts = 0
+strands = counter ()
+mistmatches = counter ()
+
+for record in bamfile:
+  strand = record.flag
+  strands[strand] += 1
+  
+if strand == 0:
+  print("Pos_strand_alignments:", count)
